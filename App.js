@@ -3,5 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 import MainScreen from "./Screens/MainScreen";
 
 export default function App() {
-  return <MainScreen />;
+  return (
+    <>
+      <StatusBar />
+      <MainScreen />
+    </>
+  );
 }
