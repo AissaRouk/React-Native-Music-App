@@ -31,7 +31,7 @@ const MainScreen = () => {
                 <Text style={styles.title}>{item.title}</Text>
                 <View style={styles.songSpecs}>
                   <Text style={styles.artist}>{item.artist}</Text>
-                  <Text> - </Text>
+                  <Text> · </Text>
                   <Text style={styles.duration}>
                     {formatDuration(item.duration)}
                   </Text>
