@@ -1,27 +1,15 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  StatusBar,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import React, { useContext } from "react";
+import { StyleSheet, ScrollView, SafeAreaView, StatusBar } from "react-native";
 import mockupSongs from "../Data/mockupSongs";
-import formatDuration from "../Utils/formatDuration";
-import Icon from "react-native-vector-icons/Entypo";
 import SearchBar from "../Components/SearchBar";
 import { Song } from "../Types/Song";
 import SongComponent from "../Components/SongComponent";
 import SmallSongComponent from "../Components/SmallSongComponent";
-
-const blackTheme = "#171C26";
-const greyColor = "#A4AAB7";
+import { AppContext } from "../Context/Context";
+import genericStyles, { blackTheme, greyColor } from "../Styles/GenericStyles";
 
 const MainScreen = () => {
-  const [currentSong, setCurrentSong] = useState<Song | null>();
+  const { currentSong, setPlayingSong } = useContext(AppContext);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -29,8 +17,9 @@ const MainScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {mockupSongs.map((item: Song) => (
           <SongComponent
+            key={item.id}
             item={item}
-            setCurrentSong={(item) => setCurrentSong(item)}
+            setCurrentSong={(item) => setPlayingSong(item)}
           />
         ))}
       </ScrollView>
