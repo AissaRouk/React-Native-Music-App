@@ -53,12 +53,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    borderColor: "black",
-    borderWidth: 1,
     paddingVertical: 10,
     paddingHorizontal: 10,
-    marginBottom: 10,
-    borderRadius: 10,
   },
   songDetails: {
     flexDirection: "row",
@@ -70,7 +66,7 @@ const styles = StyleSheet.create({
     borderRadius: 9,
   },
   textContainer: {
-    marginLeft: 10,
+    marginLeft: 20,
   },
   title: {
     fontWeight: "600",
