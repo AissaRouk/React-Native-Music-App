@@ -5,25 +5,22 @@ import {
   View,
   Image,
   SafeAreaView,
-  Dimensions,
   TouchableOpacity,
 } from "react-native";
 import { AppContext } from "../Context/Context";
 import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Slider from "@react-native-community/slider";
-import { Song } from "../Types/Song";
 import { brightGrey, greyColor } from "../Styles/GenericStyles";
 
-interface SongModalProps {
-  song: Song;
-  setCurrentPlayTime: (value: number) => void;
-}
-
 export default function SongModalComponent({
-  song,
-  setCurrentPlayTime,
-}: SongModalProps) {
+  onCloseButtonPress,
+}: {
+  onCloseButtonPress: () => void;
+}) {
+  const { setCurrentPlayingTime, currentPlayingTime, currentSong } =
+    useContext(AppContext);
+
   return (
     <SafeAreaView
       style={{
@@ -41,7 +38,9 @@ export default function SongModalComponent({
           width: "100%",
         }}
       >
-        <Text style={{ fontSize: 18 }}>X</Text>
+        <TouchableOpacity onPress={() => onCloseButtonPress()}>
+          <Text style={{ fontSize: 18 }}>X</Text>
+        </TouchableOpacity>
         <Text style={{ fontSize: 18, fontWeight: "500" }}>Current song</Text>
         <Text style={{ fontSize: 18 }}>List</Text>
       </View>
@@ -74,10 +73,11 @@ export default function SongModalComponent({
       <View style={{ minWidth: 350, marginTop: 10 }}>
         <View>
           <Slider
-            maximumValue={365}
+            maximumValue={currentSong.duration}
             style={{ height: 45 }}
             minimumTrackTintColor="black"
             maximumTrackTintColor="#000000"
+            onSlidingComplete={(number) => setCurrentPlayingTime(number)}
           />
           <View
             style={{
@@ -86,8 +86,8 @@ export default function SongModalComponent({
               marginHorizontal: 10,
             }}
           >
-            <Text>init time</Text>
-            <Text>duration time</Text>
+            <Text>00:00</Text>
+            <Text>{currentPlayingTime}</Text>
           </View>
         </View>
 
