@@ -7,17 +7,22 @@ import { Alert } from "react-native";
 interface ContextProps {
   currentSong: Song | undefined;
   setPlayingSong: (song: Song) => void;
+  currentPlayingTime: number;
+  setCurrentPlayingTime: (number: number) => void;
 }
 
 // Define the context
 export const AppContext = createContext<ContextProps>({
   currentSong: undefined,
   setPlayingSong: () => {},
+  setCurrentPlayingTime: () => {},
+  currentPlayingTime: undefined,
 });
 
 // Define the ContextProvider component
 export function ContextProvider({ children }: { children: React.ReactNode }) {
   const [currentSong, setCurrentSong] = useState<Song | undefined>();
+  const [currentPlayingTime, setCurrentPlayingTime] = useState<number>(0);
 
   // Load the last played song from AsyncStorage on component mount
   useEffect(() => {
@@ -42,11 +47,7 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     if (currentSong == song) return;
     setCurrentSong(song);
     try {
-      await AsyncStorage.setItem("lastPlayedSong", JSON.stringify(song)).then(
-        () => {
-          Alert.alert("Song " + song.title + " saved");
-        }
-      );
+      await AsyncStorage.setItem("lastPlayedSong", JSON.stringify(song));
     } catch (error) {
       console.error("Error saving last played song: ", error);
     }
@@ -56,6 +57,8 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
   const contextValue: ContextProps = {
     currentSong,
     setPlayingSong,
+    currentPlayingTime,
+    setCurrentPlayingTime,
   };
 
   return (
