@@ -1,6 +1,8 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Entypo";
 import { Song } from "../Types/Song";
+import { AppContext } from "../Context/Context";
+import { useContext } from "react";
 
 const blackTheme = "#171C26";
 const greyColor = "#A4AAB7";
@@ -14,6 +16,8 @@ export default function SmallSongComponent({
   currentSong,
   onComponentPress,
 }: SmallSongComponentProps) {
+  const { play, isPlaying, pause } = useContext(AppContext);
+
   return (
     <View style={styles.smallView}>
       <Image
@@ -43,22 +47,43 @@ export default function SmallSongComponent({
             color={"#FFFF"}
             onPress={() => {}}
           />
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#FFFF",
-              borderRadius: 5,
-              height: 40,
-              width: 40,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Icon
-              name="controller-play"
-              size={25}
-              style={{ marginHorizontal: 5 }}
-            />
-          </TouchableOpacity>
+          {!isPlaying ? (
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#FFFF",
+                borderRadius: 5,
+                height: 40,
+                width: 40,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => play()}
+            >
+              <Icon
+                name="controller-play"
+                size={25}
+                style={{ marginHorizontal: 5 }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#FFFF",
+                borderRadius: 5,
+                height: 40,
+                width: 40,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => pause()}
+            >
+              <Icon
+                name="controller-paus"
+                size={25}
+                style={{ marginHorizontal: 5 }}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
     </View>
