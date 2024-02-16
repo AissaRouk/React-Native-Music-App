@@ -50,9 +50,19 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
   }, []); // Empty dependency array to run once on component mount
 
   useEffect(() => {
-    if (isPlaying)
-      setTimeout(() => setCurrentPlayingTime(currentPlayingTime + 1), 1000);
-  }, [isPlaying]);
+    let timer: NodeJS.Timeout;
+    if (isPlaying && currentPlayingTime < currentSong.duration) {
+      timer = setInterval(() => {
+        setCurrentPlayingTime((prevTime) => prevTime + 1);
+      }, 1000);
+    } else {
+      clearInterval(timer);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isPlaying, currentPlayingTime, currentSong]);
 
   // Function to set the current playing song
   const setPlayingSong = async (song: Song) => {
