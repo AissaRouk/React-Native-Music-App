@@ -1,5 +1,11 @@
-import React, { useContext } from "react";
-import { StyleSheet, ScrollView, SafeAreaView, StatusBar } from "react-native";
+import React, { useContext, useState } from "react";
+import {
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  StatusBar,
+  Modal,
+} from "react-native";
 import mockupSongs from "../Data/mockupSongs";
 import SearchBar from "../Components/SearchBar";
 import { Song } from "../Types/Song";
@@ -7,9 +13,11 @@ import SongComponent from "../Components/SongComponent";
 import SmallSongComponent from "../Components/SmallSongComponent";
 import { AppContext } from "../Context/Context";
 import genericStyles, { blackTheme, greyColor } from "../Styles/GenericStyles";
+import SongModalComponent from "../Components/SongModalComponent";
 
 const MainScreen = () => {
   const { currentSong, setPlayingSong } = useContext(AppContext);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -23,8 +31,18 @@ const MainScreen = () => {
           />
         ))}
       </ScrollView>
+
+      <Modal visible={showModal} animationType="slide">
+        <SongModalComponent onCloseButtonPress={() => setShowModal(false)} />
+      </Modal>
+
       {/* Current song View */}
-      {currentSong && <SmallSongComponent currentSong={currentSong} />}
+      {currentSong && (
+        <SmallSongComponent
+          currentSong={currentSong}
+          onComponentPress={() => setShowModal(true)}
+        />
+      )}
     </SafeAreaView>
   );
 };
