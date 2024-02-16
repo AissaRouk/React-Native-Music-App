@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Song } from "../Types/Song";
+import mockupSongs from "../Data/mockupSongs";
 
 // Context prop types
 interface ContextProps {
@@ -31,24 +32,50 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
   const [currentSong, setCurrentSong] = useState<Song | undefined>();
   const [currentPlayingTime, setCurrentPlayingTime] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [songList, setSongList] = useState<Song[]>([]);
 
   // Load the last played song from AsyncStorage on component mount
-  useEffect(() => {
-    const loadLastPlayedSong = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("lastPlayedSong");
-        if (jsonValue !== null) {
-          const lastPlayedSong: Song = JSON.parse(jsonValue);
-          setCurrentSong(lastPlayedSong);
-        }
-      } catch (error) {
-        console.error("Error loading last played song: ", error);
+  const loadLastPlayedSong = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("lastPlayedSong");
+      if (jsonValue !== null) {
+        const lastPlayedSong: Song = JSON.parse(jsonValue);
+        setCurrentSong(lastPlayedSong);
       }
-    };
+    } catch (error) {
+      console.error("Error loading last played song: ", error);
+    }
+  };
 
+  // Load all the songs found and the new ones
+  const loadSongList = async () => {
+    try {
+      const jsonSongs = await AsyncStorage.getItem("songs");
+      if (jsonSongs !== null) {
+        const storedSongs: Song[] = JSON.parse(jsonSongs);
+        // Merge the arrays and remove duplicates
+        const mergedSongs = [
+          ...mockupSongs,
+          ...storedSongs.filter((song) => {
+            return !mockupSongs.some((mockSong) => mockSong.id === song.id);
+          }),
+        ];
+        setSongList(mergedSongs);
+      } else {
+        // If no songs are stored in AsyncStorage, use only the mockupSongs
+        setSongList(mockupSongs);
+      }
+    } catch (error) {
+      console.error("Error loading songs from AsyncStorage: ", error);
+    }
+  };
+
+  useEffect(() => {
     loadLastPlayedSong();
+    loadSongList();
   }, []); // Empty dependency array to run once on component mount
 
+  // Every second, add one sec to the currentPlayingTime
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isPlaying && currentPlayingTime < currentSong.duration) {
@@ -85,6 +112,8 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     setIsPlaying(false);
     // Logic to pause playback timer or whatever you need
   };
+
+  const likeToggle = (song: Song) => {};
 
   // Context value containing the current playing song and function to set it
   const contextValue: ContextProps = {
