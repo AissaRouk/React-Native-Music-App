@@ -7,10 +7,12 @@ const greyColor = "#A4AAB7";
 
 interface SmallSongComponentProps {
   currentSong: Song;
+  onComponentPress: () => void;
 }
 
 export default function SmallSongComponent({
   currentSong,
+  onComponentPress,
 }: SmallSongComponentProps) {
   return (
     <View style={styles.smallView}>
@@ -19,44 +21,46 @@ export default function SmallSongComponent({
         style={styles.smallViewImage}
         resizeMode="contain"
       />
-      <View>
-        <Text style={{ color: "#FFFF" }}>{currentSong.title}</Text>
-        <Text style={{ color: greyColor }}>{currentSong.artist}</Text>
-      </View>
-      {/* Play/Pause button */}
-      <View
-        style={{
-          position: "absolute",
-          right: 20,
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Icon
-          name="heart-outlined"
-          size={25}
-          style={{ marginRight: 15 }}
-          color={"#FFFF"}
-          onPress={() => {}}
-        />
-        <TouchableOpacity
+      <TouchableOpacity style={{ flex: 1 }} onPress={() => onComponentPress()}>
+        <View>
+          <Text style={{ color: "#FFFF" }}>{currentSong.title}</Text>
+          <Text style={{ color: greyColor }}>{currentSong.artist}</Text>
+        </View>
+        {/* Play/Pause button */}
+        <View
           style={{
-            backgroundColor: "#FFFF",
-            borderRadius: 5,
-            height: 40,
-            width: 40,
+            position: "absolute",
+            right: 20,
+            flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
           }}
         >
           <Icon
-            name="controller-play"
+            name="heart-outlined"
             size={25}
-            style={{ marginHorizontal: 5 }}
+            style={{ marginRight: 15 }}
+            color={"#FFFF"}
+            onPress={() => {}}
           />
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#FFFF",
+              borderRadius: 5,
+              height: 40,
+              width: 40,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Icon
+              name="controller-play"
+              size={25}
+              style={{ marginHorizontal: 5 }}
+            />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
