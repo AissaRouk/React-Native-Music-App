@@ -20,8 +20,14 @@ export default function SongModalComponent({
 }: {
   onCloseButtonPress: () => void;
 }) {
-  const { setCurrentPlayingTime, currentPlayingTime, currentSong } =
-    useContext(AppContext);
+  const {
+    setCurrentPlayingTime,
+    currentPlayingTime,
+    currentSong,
+    isPlaying,
+    play,
+    pause,
+  } = useContext(AppContext);
 
   return (
     <SafeAreaView
@@ -51,8 +57,8 @@ export default function SongModalComponent({
           style={styles.songImage}
           resizeMode="contain"
         />
-        <Text style={styles.songName}>Song Name</Text>
-        <Text style={styles.songArtist}>Artist</Text>
+        <Text style={styles.songName}>{currentSong.title}</Text>
+        <Text style={styles.songArtist}>{currentSong.artist}</Text>
       </View>
 
       {/* Timeline bar */}
@@ -79,14 +85,25 @@ export default function SongModalComponent({
             <Icon name="controller-jump-to-start" size={55} />
           </TouchableOpacity>
 
-          <TouchableOpacity>
-            <FontAwesome
-              name="play-circle"
-              size={85}
-              color={"black"}
-              style={{ marginHorizontal: 45 }}
-            />
-          </TouchableOpacity>
+          {!isPlaying ? (
+            <TouchableOpacity onPress={() => play()}>
+              <FontAwesome
+                name="play-circle"
+                size={85}
+                color={"black"}
+                style={{ marginHorizontal: 45 }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => pause()}>
+              <FontAwesome
+                name="pause-circle"
+                size={85}
+                color={"black"}
+                style={{ marginHorizontal: 45 }}
+              />
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity>
             <Icon name="controller-next" size={55} />
