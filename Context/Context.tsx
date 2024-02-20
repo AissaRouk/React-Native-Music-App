@@ -14,6 +14,7 @@ interface ContextProps {
   isPlaying: boolean;
   setIsPlaying: (bool: boolean) => void;
   likeToggle: (song: Song) => void;
+  changeSong: (direction: "backwards" | "forward") => void;
 }
 
 // Define the context
@@ -27,6 +28,7 @@ export const AppContext = createContext<ContextProps>({
   isPlaying: false,
   setIsPlaying: () => null,
   likeToggle: () => null,
+  changeSong: () => null,
 });
 
 // Define the ContextProvider component
@@ -97,7 +99,6 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
   // Update current song when songList changes
   useEffect(() => {
     // Check if current song is in the new song list
-    console.log("Songlist has changed");
     const currentSongInList = songList.find(
       (song) => song.id === currentSong?.id
     );
@@ -161,6 +162,33 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  //function to allow the next and back song changing functionalities
+  const changeSong = (direction: "backwards" | "forward") => {
+    if (!currentSong) {
+      console.error("There's no chosen song!!");
+      return;
+    }
+
+    const indexOfSong = songList.indexOf(currentSong);
+    if (indexOfSong === -1) {
+      console.error("Error, indexOfSong < 0");
+      return;
+    }
+
+    const numSongs = songList.length;
+    let newIndex =
+      (indexOfSong + (direction === "forward" ? 1 : -1)) % numSongs;
+
+    // Handle negative index
+    if (newIndex < 0) {
+      newIndex = numSongs - 1;
+    }
+
+    setCurrentSong(songList[newIndex]);
+    setCurrentPlayingTime(0);
+    setIsPlaying(true);
+  };
+
   // Context value containing the current playing song and function to set it
   const contextValue: ContextProps = {
     currentSong,
@@ -172,6 +200,7 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     isPlaying,
     setIsPlaying,
     likeToggle,
+    changeSong,
   };
 
   return (
