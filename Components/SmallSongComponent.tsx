@@ -16,7 +16,7 @@ export default function SmallSongComponent({
   currentSong,
   onComponentPress,
 }: SmallSongComponentProps) {
-  const { play, isPlaying, pause } = useContext(AppContext);
+  const { play, isPlaying, pause, likeToggle } = useContext(AppContext);
 
   return (
     <View style={styles.smallView}>
@@ -40,13 +40,22 @@ export default function SmallSongComponent({
             alignItems: "center",
           }}
         >
-          <Icon
-            name="heart-outlined"
-            size={25}
-            style={{ marginRight: 15 }}
-            color={"#FFFF"}
-            onPress={() => {}}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              likeToggle(currentSong), console.log("clicked!!");
+            }}
+            style={{
+              marginRight: 10,
+              padding: 5,
+            }}
+          >
+            <Icon
+              name={currentSong.like ? "heart" : "heart-outlined"}
+              size={25}
+              color={"#FFFF"}
+            />
+          </TouchableOpacity>
+
           {!isPlaying ? (
             <TouchableOpacity
               style={{
