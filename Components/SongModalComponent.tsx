@@ -27,6 +27,7 @@ export default function SongModalComponent({
     isPlaying,
     play,
     pause,
+    changeSong,
   } = useContext(AppContext);
 
   return (
@@ -81,10 +82,12 @@ export default function SongModalComponent({
         </View>
 
         <View style={styles.controlButtonsView}>
+          {/* Previous button */}
           <TouchableOpacity>
             <Icon name="controller-jump-to-start" size={55} />
           </TouchableOpacity>
 
+          {/* Play/Pause buttons */}
           {!isPlaying ? (
             <TouchableOpacity onPress={() => play()}>
               <FontAwesome
@@ -105,7 +108,8 @@ export default function SongModalComponent({
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity>
+          {/* Forward button */}
+          <TouchableOpacity onPress={() => changeSong("forward")}>
             <Icon name="controller-next" size={55} />
           </TouchableOpacity>
         </View>
