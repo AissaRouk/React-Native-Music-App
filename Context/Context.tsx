@@ -38,6 +38,8 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [songList, setSongList] = useState<Song[]>([]);
 
+  //Song functions
+
   // Load the last played song from AsyncStorage on component mount
   const loadLastPlayedSong = async () => {
     try {
@@ -75,41 +77,6 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    loadLastPlayedSong();
-    loadSongList();
-  }, []); // Empty dependency array to run once on component mount
-
-  // Every second, add one sec to the currentPlayingTime
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying && currentPlayingTime < currentSong.duration) {
-      timer = setInterval(() => {
-        setCurrentPlayingTime((prevTime) => prevTime + 1);
-      }, 1000);
-    } else {
-      clearInterval(timer);
-    }
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, [isPlaying, currentPlayingTime, currentSong]);
-
-  // Update current song when songList changes
-  useEffect(() => {
-    // Check if current song is in the new song list
-    const currentSongInList = songList.find(
-      (song) => song.id === currentSong?.id
-    );
-    // If not, set current song to undefined
-    if (!currentSongInList) {
-      setCurrentSong(songList[0] || undefined);
-    } else {
-      setCurrentSong(currentSongInList);
-    }
-  }, [songList]);
-
   //Save in AsyncStorage the songList
   const saveSongList = async () => {
     try {
@@ -129,36 +96,6 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
       await AsyncStorage.setItem("lastPlayedSong", JSON.stringify(song));
     } catch (error) {
       console.error("Error saving last played song: ", error);
-    }
-  };
-
-  const play = () => {
-    setIsPlaying(true);
-    // Logic to start playback timer or whatever you need
-  };
-
-  const pause = () => {
-    setIsPlaying(false);
-    // Logic to pause playback timer or whatever you need
-  };
-
-  const likeToggle = (song: Song) => {
-    // Find the index of the song in the songList array
-    const songIndex = songList.findIndex((s) => s.id === song.id);
-
-    // If the song is found in the songList array
-    if (songIndex !== -1) {
-      // Create a copy of the songList array to avoid mutating the state directly
-      const updatedSongList = [...songList];
-
-      // Toggle the 'like' property of the song
-      updatedSongList[songIndex] = {
-        ...updatedSongList[songIndex],
-        like: !updatedSongList[songIndex].like,
-      };
-
-      // Update the state with the modified songList array
-      setSongList(updatedSongList);
     }
   };
 
@@ -187,6 +124,103 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     setCurrentSong(songList[newIndex]);
     setCurrentPlayingTime(0);
     setIsPlaying(true);
+  };
+
+  // Time functions
+  const loadLastCurrentTime = async () => {
+    try {
+      const lastPlayedTime = await AsyncStorage.getItem("currentPlayingTime");
+      if (lastPlayedTime) {
+        const parsedTime: number = parseInt(lastPlayedTime);
+        if (!isNaN(parsedTime)) {
+          setCurrentPlayingTime(parsedTime);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading last current time: ", error);
+    }
+  };
+
+  const saveCurrentPlayingTime = async () => {
+    try {
+      AsyncStorage.setItem(
+        "currentPlayingTime",
+        JSON.stringify(currentPlayingTime)
+      );
+    } catch (error) {
+      if (error)
+        console.log(
+          "Error in saving the currentPlayingTime: " + JSON.stringify(error)
+        );
+    }
+  };
+
+  const play = () => {
+    setIsPlaying(true);
+    // Logic to start playback timer or whatever you need
+  };
+
+  const pause = () => {
+    setIsPlaying(false);
+    // Logic to pause playback timer or whatever you need
+  };
+
+  // UseEffect functions
+  useEffect(() => {
+    loadLastPlayedSong();
+    loadSongList();
+    loadLastCurrentTime();
+  }, []); // Empty dependency array to run once on component mount
+
+  // Every second, add one sec to the currentPlayingTime
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isPlaying && currentPlayingTime < currentSong.duration) {
+      timer = setInterval(() => {
+        setCurrentPlayingTime((prevTime) => prevTime + 1);
+        if (currentPlayingTime % 10 == 0) saveCurrentPlayingTime();
+      }, 1000);
+    } else {
+      clearInterval(timer);
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isPlaying, currentPlayingTime, currentSong]);
+
+  // Update current song when songList changes
+  useEffect(() => {
+    // Check if current song is in the new song list
+    const currentSongInList = songList.find(
+      (song) => song.id === currentSong?.id
+    );
+    // If not, set current song to undefined
+    if (!currentSongInList) {
+      setCurrentSong(songList[0] || undefined);
+    } else {
+      setCurrentSong(currentSongInList);
+    }
+  }, [songList]);
+
+  const likeToggle = (song: Song) => {
+    // Find the index of the song in the songList array
+    const songIndex = songList.findIndex((s) => s.id === song.id);
+
+    // If the song is found in the songList array
+    if (songIndex !== -1) {
+      // Create a copy of the songList array to avoid mutating the state directly
+      const updatedSongList = [...songList];
+
+      // Toggle the 'like' property of the song
+      updatedSongList[songIndex] = {
+        ...updatedSongList[songIndex],
+        like: !updatedSongList[songIndex].like,
+      };
+
+      // Update the state with the modified songList array
+      setSongList(updatedSongList);
+    }
   };
 
   // Context value containing the current playing song and function to set it
