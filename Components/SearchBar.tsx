@@ -33,7 +33,7 @@ interface SearchBarProps {
   clearIcon?: React.ReactNode;
   onFocus?: () => void;
   onBlur?: () => void;
-  mainContainerView?: StyleProp<ViewStyle>;
+  mainContainerViewStyle?: StyleProp<ViewStyle>;
 }
 
 export default function SearchBar({
@@ -54,7 +54,7 @@ export default function SearchBar({
   clearIcon,
   onFocus,
   onBlur,
-  mainContainerView,
+  mainContainerViewStyle,
 }: SearchBarProps) {
   // State for managing suggestions visibility
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
@@ -135,7 +135,7 @@ export default function SearchBar({
   //   }, [searchResults]);
 
   return (
-    <View style={mainContainerView}>
+    <View style={mainContainerViewStyle}>
       {/* Search bar container */}
       <View
         style={[
