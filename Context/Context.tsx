@@ -15,6 +15,7 @@ interface ContextProps {
   setIsPlaying: (bool: boolean) => void;
   likeToggle: (song: Song) => void;
   changeSong: (direction: "backwards" | "forward") => void;
+  songList: Song[];
 }
 
 // Define the context
@@ -29,6 +30,7 @@ export const AppContext = createContext<ContextProps>({
   setIsPlaying: () => null,
   likeToggle: () => null,
   changeSong: () => null,
+  songList: undefined,
 });
 
 // Define the ContextProvider component
@@ -237,6 +239,7 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     setIsPlaying,
     likeToggle,
     changeSong,
+    songList,
   };
 
   return (
