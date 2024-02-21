@@ -92,6 +92,8 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
     // Don't save if the song is already saved
     if (currentSong == song) return;
     setCurrentSong(song);
+    setIsPlaying(true);
+    setCurrentPlayingTime(0);
     try {
       await AsyncStorage.setItem("lastPlayedSong", JSON.stringify(song));
     } catch (error) {
