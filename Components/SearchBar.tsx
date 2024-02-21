@@ -33,6 +33,7 @@ interface SearchBarProps {
   clearIcon?: React.ReactNode;
   onFocus?: () => void;
   onBlur?: () => void;
+  mainContainerView?: StyleProp<ViewStyle>;
 }
 
 export default function SearchBar({
@@ -53,6 +54,7 @@ export default function SearchBar({
   clearIcon,
   onFocus,
   onBlur,
+  mainContainerView,
 }: SearchBarProps) {
   // State for managing suggestions visibility
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
@@ -133,13 +135,13 @@ export default function SearchBar({
   //   }, [searchResults]);
 
   return (
-    <View style={{ marginBottom: 10 }}>
+    <View style={mainContainerView}>
       {/* Search bar container */}
       <View
         style={[
           styles.searchbarView,
-          styles.searchBarMargins,
           styles.searchBarBackground,
+          styles.searchBarPaddings,
           border && styles.searchBarBorder,
           showSuggestions && {
             borderBottomEndRadius: 0,
@@ -192,7 +194,6 @@ export default function SearchBar({
       {showSuggestions && (
         <View
           style={[
-            styles.searchBarMargins,
             styles.searchBarBackground,
             styles.searchBarBorder,
             suggestionBoxStyle,
@@ -227,23 +228,19 @@ export default function SearchBar({
 // Styles
 const styles = StyleSheet.create({
   searchbarView: {
-    overflow: "hidden",
+    minWidth: 200,
     height: 35,
-    marginTop: 30,
     borderColor: "black",
     borderWidth: 1,
-    width: "90%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    // marginBottom: 10,
+  },
+  searchBarPaddings: {
+    paddingHorizontal: 7,
   },
   searchBarBackground: {
     backgroundColor: "white",
-  },
-  searchBarMargins: {
-    paddingHorizontal: 10,
-    marginHorizontal: 20,
   },
   searchBarBorder: {
     borderRadius: 7,
