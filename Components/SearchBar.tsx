@@ -3,13 +3,13 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Text,
   StyleSheet,
   StyleProp,
   ViewStyle,
   TextStyle,
+  Text,
 } from "react-native";
-// import { useMiniSearch } from "react-minisearch";
+import { useMiniSearch } from "react-minisearch";
 // import sortResultsByPrice from "./sortFunction";
 
 // Defining types of props
@@ -19,6 +19,7 @@ interface SearchBarProps {
   data: readonly any[];
   onSearchResultsChange?: (searchResult: readonly any[] | null) => void;
   autofocus?: boolean;
+  suggestionShown: boolean;
 
   // Additional customization props
   backgroundColor?: string;
@@ -34,6 +35,8 @@ interface SearchBarProps {
   onFocus?: () => void;
   onBlur?: () => void;
   mainContainerViewStyle?: StyleProp<ViewStyle>;
+  fields?: string[];
+  idField?: string;
 }
 
 export default function SearchBar({
@@ -55,84 +58,94 @@ export default function SearchBar({
   onFocus,
   onBlur,
   mainContainerViewStyle,
+  suggestionShown = true,
+  fields,
+  idField,
 }: SearchBarProps) {
   // State for managing suggestions visibility
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
   // MiniSearch hook for handling search functionality
-  //   const {
-  //     autoSuggest,
-  //     suggestions,
-  //     clearSuggestions,
-  //     search,
-  //     searchResults,
-  //     removeAll,
-  //     addAll,
-  //   } = useMiniSearch(data, {
-  //     fields: ["name"],
-  //     idField: "id",
-  //     searchOptions: {
-  //       prefix: true,
-  //       fuzzy: true,
-  //     },
-  //     autoSuggestOptions: {
-  //       prefix: true,
-  //       fuzzy: true,
-  //     },
-  //   });
+  const {
+    autoSuggest,
+    suggestions,
+    clearSuggestions,
+    search,
+    clearSearch,
+    searchResults,
+    removeAll,
+    addAll,
+  } = useMiniSearch(data, {
+    fields: fields || [],
+    idField: idField,
+    searchOptions: {
+      prefix: true,
+      fuzzy: true,
+    },
+    autoSuggestOptions: {
+      prefix: true,
+      fuzzy: true,
+    },
+  });
 
   // State for the text introduced in the searchBar
   const [searchValue, setSearchValue] = useState("");
 
   // Show suggestions every time the text changes
-  //   const onChangeText = (text: string) => {
-  //     setSearchValue(text);
-  //     if (!text) {
-  //       setShowSuggestions(false);
-  //       clearSuggestions();
-  //       return;
-  //     }
-  //     autoSuggest(text);
-  //     setShowSuggestions(true);
-  //   };
+  const onChangeText = (text: string) => {
+    setSearchValue(text);
+    if (!text) {
+      !suggestionShown && console.log("Not text");
+      setShowSuggestions(false);
+      clearSuggestions();
+      !suggestionShown && clearSearch();
+      return;
+    }
+    if (suggestionShown) {
+      autoSuggest(text);
+      setShowSuggestions(true);
+    } else {
+      search(text);
+    }
+  };
 
   // Search when clicked enter (onBlur) in the searchBar
-  //   const handleOnBlur = () => {
-  //     if (searchValue) {
-  //       clearSuggestions();
-  //       search(searchValue);
-  //       setShowSuggestions(false);
-  //       onBlur && onBlur();
-  //     }
-  //   };
+  const handleOnBlur = () => {
+    if (searchValue) {
+      clearSuggestions();
+      search(searchValue);
+      suggestionShown && setShowSuggestions(false);
+      onBlur && onBlur();
+    }
+  };
 
   // Function to handle pressing on one of the suggestions
-  //   const handleOnSuggestionPress = (item: any) => {
-  //     // Save the value
-  //     setSearchValue(item.suggestion);
-  //     // Clear the suggestions
-  //     setShowSuggestions(false);
-  //     clearSuggestions();
-  //     // Search for the result
-  //     search(item.suggestion);
-  //   };
+  const handleOnSuggestionPress = (item: any) => {
+    // Save the value
+    setSearchValue(item.suggestion);
+    // Clear the suggestions
+    suggestionShown && setShowSuggestions(false);
+    suggestionShown && clearSuggestions();
+    // Search for the result
+    search(item.suggestion);
+  };
+
+  // Do something when the results change
+  useEffect(() => {
+    // Update MiniSearch data when data prop changes
+    if (data) {
+      removeAll();
+      addAll(data);
+    }
+  }, [data]);
 
   //   // Do something when the results change
-  //   useEffect(() => {
-  //     // Update MiniSearch data when data prop changes
-  //     if (data) {
-  //       removeAll();
-  //       addAll(data);
-  //     }
-  //   }, [data]);
-
-  //   // Do something when the results change
-  //   useEffect(() => {
-  //     // Sort the results by price order
-  //     if (searchResults) {
-  //       onSearchResultsChange && onSearchResultsChange(searchResults);
-  //     }
-  //   }, [searchResults]);
+  useEffect(() => {
+    // Sort the results by price order
+    if (searchResults || !suggestionShown) {
+      onSearchResultsChange && onSearchResultsChange(searchResults);
+    }
+  }, [searchResults]);
 
   return (
     <View style={mainContainerViewStyle}>
@@ -143,11 +156,12 @@ export default function SearchBar({
           styles.searchBarBackground,
           styles.searchBarPaddings,
           border && styles.searchBarBorder,
-          showSuggestions && {
-            borderBottomEndRadius: 0,
-            borderBottomLeftRadius: 0,
-            borderBottomWidth: 0,
-          },
+          suggestionShown &&
+            showSuggestions && {
+              borderBottomEndRadius: 0,
+              borderBottomLeftRadius: 0,
+              borderBottomWidth: 0,
+            },
           {
             backgroundColor: backgroundColor,
             borderColor: borderColor,
@@ -166,13 +180,13 @@ export default function SearchBar({
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           value={searchValue}
-          //   onChangeText={onChangeText}
+          onChangeText={onChangeText}
           blurOnSubmit={true}
           onBlur={() => {
-            // handleOnBlur();
+            handleOnBlur();
           }}
           onFocus={() => {
-            setShowSuggestions(true);
+            suggestionShown && setShowSuggestions(true);
             onFocus && onFocus();
           }}
           autoFocus={autofocus}
@@ -186,28 +200,29 @@ export default function SearchBar({
       </View>
 
       {/* Conditional rendering of line based on showSuggestions */}
-      {showSuggestions && (
+      {suggestionShown && showSuggestions && (
         <View style={[styles.line, { marginHorizontal: 25 }]}></View>
       )}
 
       {/* Suggestions container */}
-      {showSuggestions && (
+      {suggestionShown && showSuggestions && (
         <View
           style={[
             styles.searchBarBackground,
             styles.searchBarBorder,
             suggestionBoxStyle,
-            showSuggestions && {
-              borderTopWidth: 0,
-              borderTopStartRadius: 0,
-              borderTopEndRadius: 0,
-              paddingBottom: 5,
-              // flex: 1,
-            },
+            suggestionShown &&
+              showSuggestions && {
+                borderTopWidth: 0,
+                borderTopStartRadius: 0,
+                borderTopEndRadius: 0,
+                paddingBottom: 5,
+                // flex: 1,
+              },
           ]}
         >
           {/* Render suggestions */}
-          {/* {suggestions &&
+          {suggestions &&
             suggestions.map((item) => (
               <TouchableOpacity
                 style={[styles.suggestionItem]}
@@ -218,7 +233,7 @@ export default function SearchBar({
                   {item.suggestion}
                 </Text>
               </TouchableOpacity>
-            ))} */}
+            ))}
         </View>
       )}
     </View>
