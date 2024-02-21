@@ -83,7 +83,7 @@ export default function SongModalComponent({
 
         <View style={styles.controlButtonsView}>
           {/* Previous button */}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => changeSong("backwards")}>
             <Icon name="controller-jump-to-start" size={55} />
           </TouchableOpacity>
 
