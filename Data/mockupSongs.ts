@@ -3,19 +3,21 @@ import { Song } from "../Types/Song";
 const mockupSongs: Song[] = [
   {
     id: "1",
-    title: "Song Title 1",
-    artist: "Artist 1",
+    title: "Pelele",
+    artist: "Morad",
     duration: 180,
     album: "Album 1",
     releaseYear: 2022,
+    like: false,
   },
   {
     id: "2",
-    title: "Song Title 2",
-    artist: "Artist 2",
+    title: "I love you",
+    artist: "Adam Rouk",
     duration: 240,
     album: "Album 2",
     releaseYear: 2020,
+    like: false,
   },
   {
     id: "3",
@@ -23,14 +25,16 @@ const mockupSongs: Song[] = [
     artist: "Artist 3",
     duration: 200,
     releaseYear: 2019,
+    like: false,
   },
   {
     id: "4",
-    title: "Song Title 4",
-    artist: "Artist 1",
+    title: "I hate you",
+    artist: "Adam Rouk",
     duration: 210,
     album: "Album 3",
     releaseYear: 2021,
+    like: false,
   },
   {
     id: "5",
@@ -38,6 +42,15 @@ const mockupSongs: Song[] = [
     artist: "Artist 4",
     duration: 190,
     releaseYear: 2020,
+    like: false,
+  },
+  {
+    id: "6",
+    title: "Song Title 6",
+    artist: "Artist 5",
+    duration: 190,
+    releaseYear: 2020,
+    like: false,
   },
   // Add more songs as needed
 ];

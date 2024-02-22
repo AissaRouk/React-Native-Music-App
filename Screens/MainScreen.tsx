@@ -15,13 +15,18 @@ import { AppContext } from "../Context/Context";
 import genericStyles, { blackTheme, greyColor } from "../Styles/GenericStyles";
 import SongModalComponent from "../Components/SongModalComponent";
 
-const MainScreen = () => {
+const MainScreen = ({ navigation }) => {
   const { currentSong, setPlayingSong } = useContext(AppContext);
   const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
     <SafeAreaView style={styles.container}>
-      <SearchBar data={[]} />
+      <SearchBar
+        data={[]}
+        onFocus={() => navigation.navigate("search")}
+        mainContainerViewStyle={{ marginHorizontal: 20, marginVertical: 10 }}
+        suggestionShown={false}
+      />
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {mockupSongs.map((item: Song) => (
           <SongComponent
@@ -57,7 +62,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flex: 1,
   },
-
   smallView: {
     height: 80,
     backgroundColor: blackTheme,

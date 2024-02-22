@@ -1,6 +1,8 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Entypo";
 import { Song } from "../Types/Song";
+import { AppContext } from "../Context/Context";
+import { useContext } from "react";
 
 const blackTheme = "#171C26";
 const greyColor = "#A4AAB7";
@@ -14,6 +16,8 @@ export default function SmallSongComponent({
   currentSong,
   onComponentPress,
 }: SmallSongComponentProps) {
+  const { play, isPlaying, pause, likeToggle } = useContext(AppContext);
+
   return (
     <View style={styles.smallView}>
       <Image
@@ -36,29 +40,59 @@ export default function SmallSongComponent({
             alignItems: "center",
           }}
         >
-          <Icon
-            name="heart-outlined"
-            size={25}
-            style={{ marginRight: 15 }}
-            color={"#FFFF"}
-            onPress={() => {}}
-          />
           <TouchableOpacity
+            onPress={() => {
+              likeToggle(currentSong), console.log("clicked!!");
+            }}
             style={{
-              backgroundColor: "#FFFF",
-              borderRadius: 5,
-              height: 40,
-              width: 40,
-              justifyContent: "center",
-              alignItems: "center",
+              marginRight: 10,
+              padding: 5,
             }}
           >
             <Icon
-              name="controller-play"
+              name={currentSong.like ? "heart" : "heart-outlined"}
               size={25}
-              style={{ marginHorizontal: 5 }}
+              color={"#FFFF"}
             />
           </TouchableOpacity>
+
+          {!isPlaying ? (
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#FFFF",
+                borderRadius: 5,
+                height: 40,
+                width: 40,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => play()}
+            >
+              <Icon
+                name="controller-play"
+                size={25}
+                style={{ marginHorizontal: 5 }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#FFFF",
+                borderRadius: 5,
+                height: 40,
+                width: 40,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={() => pause()}
+            >
+              <Icon
+                name="controller-paus"
+                size={25}
+                style={{ marginHorizontal: 5 }}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
     </View>

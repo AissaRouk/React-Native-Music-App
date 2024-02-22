@@ -6,20 +6,29 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { AppContext } from "../Context/Context";
 import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Slider from "@react-native-community/slider";
-import { brightGrey, greyColor } from "../Styles/GenericStyles";
+import { greyColor } from "../Styles/GenericStyles";
+import formatDuration from "../Utils/formatDuration";
 
 export default function SongModalComponent({
   onCloseButtonPress,
 }: {
   onCloseButtonPress: () => void;
 }) {
-  const { setCurrentPlayingTime, currentPlayingTime, currentSong } =
-    useContext(AppContext);
+  const {
+    setCurrentPlayingTime,
+    currentPlayingTime,
+    currentSong,
+    isPlaying,
+    play,
+    pause,
+    changeSong,
+  } = useContext(AppContext);
 
   return (
     <SafeAreaView
@@ -31,88 +40,76 @@ export default function SongModalComponent({
         paddingTop: 20,
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "100%",
-        }}
-      >
+      {/* Header */}
+      <View style={styles.headerView}>
         <TouchableOpacity onPress={() => onCloseButtonPress()}>
-          <Text style={{ fontSize: 18 }}>X</Text>
+          <Text style={styles.headerText}>X</Text>
         </TouchableOpacity>
-        <Text style={{ fontSize: 18, fontWeight: "500" }}>Current song</Text>
-        <Text style={{ fontSize: 18 }}>List</Text>
+        <Text style={{ fontWeight: "600", ...styles.headerText }}>
+          Current song
+        </Text>
+        <Text style={styles.headerText}>List</Text>
       </View>
-      <View style={{ alignItems: "center", marginVertical: 30 }}>
+
+      {/* ContentView */}
+      <View style={styles.contentViewHeader}>
         <Image
           source={require("../Data/Images/NoteImage.jpeg")}
-          style={{
-            height: 300,
-            width: 300,
-            borderRadius: 30,
-            shadowColor: "black",
-          }}
+          style={styles.songImage}
           resizeMode="contain"
         />
-        <Text style={{ marginTop: 20, fontSize: 30, fontWeight: "600" }}>
-          Song Name
-        </Text>
-        <Text
-          style={{
-            marginTop: 10,
-            fontSize: 18,
-            color: greyColor,
-            fontWeight: "500",
-          }}
-        >
-          Artist
-        </Text>
+        <Text style={styles.songName}>{currentSong.title}</Text>
+        <Text style={styles.songArtist}>{currentSong.artist}</Text>
       </View>
+
       {/* Timeline bar */}
       <View style={{ minWidth: 350, marginTop: 10 }}>
         <View>
           <Slider
             maximumValue={currentSong.duration}
+            value={currentPlayingTime}
             style={{ height: 45 }}
             minimumTrackTintColor="black"
             maximumTrackTintColor="#000000"
-            onSlidingComplete={(number) => setCurrentPlayingTime(number)}
+            onValueChange={(number) => setCurrentPlayingTime(number)}
+            currentPlayingTime={false}
+            step={1}
           />
-          <View
-            style={{
-              justifyContent: "space-between",
-              flexDirection: "row",
-              marginHorizontal: 10,
-            }}
-          >
+          <View style={styles.sliderTimeView}>
             <Text>00:00</Text>
-            <Text>{currentPlayingTime}</Text>
+            <Text>{formatDuration(currentPlayingTime)}</Text>
           </View>
         </View>
 
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 30,
-          }}
-        >
-          <TouchableOpacity>
+        <View style={styles.controlButtonsView}>
+          {/* Previous button */}
+          <TouchableOpacity onPress={() => changeSong("backwards")}>
             <Icon name="controller-jump-to-start" size={55} />
           </TouchableOpacity>
 
-          <TouchableOpacity>
-            <FontAwesome
-              name="play-circle"
-              size={85}
-              color={"black"}
-              style={{ marginHorizontal: 45 }}
-            />
-          </TouchableOpacity>
+          {/* Play/Pause buttons */}
+          {!isPlaying ? (
+            <TouchableOpacity onPress={() => play()}>
+              <FontAwesome
+                name="play-circle"
+                size={85}
+                color={"black"}
+                style={{ marginHorizontal: 45 }}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => pause()}>
+              <FontAwesome
+                name="pause-circle"
+                size={85}
+                color={"black"}
+                style={{ marginHorizontal: 45 }}
+              />
+            </TouchableOpacity>
+          )}
 
-          <TouchableOpacity>
+          {/* Forward button */}
+          <TouchableOpacity onPress={() => changeSong("forward")}>
             <Icon name="controller-next" size={55} />
           </TouchableOpacity>
         </View>
@@ -120,3 +117,42 @@ export default function SongModalComponent({
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  headerView: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  headerText: {
+    fontSize: 18,
+  },
+  contentViewHeader: {
+    alignItems: "center",
+    marginVertical: 30,
+  },
+  songImage: {
+    height: 300,
+    width: 300,
+    borderRadius: 30,
+    shadowColor: "black",
+  },
+  songName: { marginTop: 20, fontSize: 30, fontWeight: "600" },
+  songArtist: {
+    marginTop: 10,
+    fontSize: 18,
+    color: greyColor,
+    fontWeight: "500",
+  },
+  sliderTimeView: {
+    justifyContent: "space-between",
+    flexDirection: "row",
+    marginHorizontal: 10,
+  },
+  controlButtonsView: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
+  },
+});
